@@ -1,0 +1,6 @@
+{
+    "go.inferGopath": false,
+    "go.gotoSymbol.includeImports": true,
+    "go.gotoSymbol.includeGoroot": true,
+    "go.gopath": ""
+}
