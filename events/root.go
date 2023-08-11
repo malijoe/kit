@@ -40,6 +40,10 @@ func (r *AggregateRoot) Type() string {
 	return r.typ
 }
 
+func (r *AggregateRoot) Version() uint64 {
+	return r.version
+}
+
 func (r *AggregateRoot) Events() (events []Event) {
 	// make a copy of the slice to prevent outside manipulation
 	events = make([]Event, len(r.events))
