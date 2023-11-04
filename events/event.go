@@ -14,7 +14,7 @@ type Event struct {
 	timestamp     time.Time
 	aggregateType string
 	aggregateID   string
-	version       uint64
+	version       int64
 	metadata      []byte
 }
 
@@ -56,11 +56,11 @@ func (e Event) AggregateID() string {
 	return e.aggregateID
 }
 
-func (e Event) Version() uint64 {
+func (e Event) Version() int64 {
 	return e.version
 }
 
-func (e Event) SetVersion(version uint64) {
+func (e Event) SetVersion(version int64) {
 	e.version = version
 }
 

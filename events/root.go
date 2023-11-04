@@ -9,8 +9,8 @@ type when func(event Event) error
 
 type AggregateRoot struct {
 	id            string
-	version       uint64
-	globalVersion uint64
+	version       int64
+	globalVersion int64
 	typ           string
 	events        []Event
 	when          when
@@ -24,10 +24,11 @@ func NewAggregateRoot(id string, typ string, when when) (root *AggregateRoot) {
 		return
 	}
 	root = &AggregateRoot{
-		id:     id,
-		typ:    typ,
-		when:   when,
-		events: make([]Event, 0, aggregateEventsInitialCap),
+		id:      id,
+		typ:     typ,
+		when:    when,
+		version: aggregateStartVersion,
+		events:  make([]Event, 0, aggregateEventsInitialCap),
 	}
 	return
 }
@@ -40,7 +41,7 @@ func (r *AggregateRoot) Type() string {
 	return r.typ
 }
 
-func (r *AggregateRoot) Version() uint64 {
+func (r *AggregateRoot) Version() int64 {
 	return r.version
 }
 
