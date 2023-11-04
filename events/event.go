@@ -23,6 +23,7 @@ func NewEvent(root Aggregate, typ string) Event {
 		id:            uuid.NewV4().String(),
 		aggregateType: root.Type(),
 		aggregateID:   root.ID(),
+		version:       root.Version() + 1,
 		typ:           typ,
 		timestamp:     time.Now().UTC(),
 	}
