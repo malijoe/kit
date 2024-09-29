@@ -33,6 +33,8 @@ func (s *store) SaveAggregate(ctx context.Context, agg events.Aggregate) error {
 	if err != nil {
 		return err
 	}
+	defer txn.Rollback()
+
 	typeBckt, err := txn.CreateBucketIfNotExists([]byte(agg.Type()))
 	if err != nil {
 		return err
@@ -57,7 +59,8 @@ func (s *store) SaveAggregate(ctx context.Context, agg events.Aggregate) error {
 			return err
 		}
 	}
-	return nil
+
+	return txn.Commit()
 }
 
 func (s *store) LoadAggregate(ctx context.Context, agg events.Aggregate) error {
