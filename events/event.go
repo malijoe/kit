@@ -28,7 +28,7 @@ func (event Event) Marshal() any {
 		Id            string    `json:"id" yaml:"id"`
 		Type          string    `json:"type" yaml:"type"`
 		Data          []byte    `json:"data,omitempty" yaml:"data,omitempty"`
-		Timestamp     time.Time `json:"timestmpa" yaml:"timestamp"`
+		Timestamp     time.Time `json:"timestamp" yaml:"timestamp"`
 		AggregateId   string    `json:"aggregateId" yaml:"aggregateId"`
 		AggregateType string    `json:"aggregateType" yaml:"aggregateType"`
 		Version       int64     `json:"version" yaml:"version"`
@@ -131,7 +131,7 @@ func (e Event) Version() int64 {
 	return e.version
 }
 
-func (e Event) SetVersion(version int64) {
+func (e *Event) SetVersion(version int64) {
 	e.version = version
 }
 
