@@ -1,6 +1,7 @@
 package events
 
 import (
+	"cmp"
 	"encoding/json"
 	"time"
 
@@ -18,6 +19,67 @@ type Event struct {
 	metadata      []byte
 }
 
+func EventSortFunc(a, b Event) int {
+	return cmp.Compare(a.version, b.version)
+}
+
+func (event Event) Marshal() any {
+	return struct {
+		Id            string    `json:"id" yaml:"id"`
+		Type          string    `json:"type" yaml:"type"`
+		Data          []byte    `json:"data,omitempty" yaml:"data,omitempty"`
+		Timestamp     time.Time `json:"timestmpa" yaml:"timestamp"`
+		AggregateId   string    `json:"aggregateId" yaml:"aggregateId"`
+		AggregateType string    `json:"aggregateType" yaml:"aggregateType"`
+		Version       int64     `json:"version" yaml:"version"`
+		Metadata      []byte    `json:"metadata,omitempty" yaml:"metadata,omitempty"`
+	}{
+		Id:            event.id,
+		Type:          event.typ,
+		Data:          event.data,
+		Timestamp:     event.timestamp,
+		AggregateId:   event.aggregateID,
+		AggregateType: event.aggregateType,
+		Version:       event.version,
+		Metadata:      event.metadata,
+	}
+}
+
+func (event Event) MarshalJSON() ([]byte, error) {
+	return json.Marshal(event.Marshal())
+}
+
+func (event *Event) Unmarshal(unmarshal func(any) error) error {
+	var obj struct {
+		Id            string    `json:"id" yaml:"id"`
+		Type          string    `json:"type" yaml:"type"`
+		Data          []byte    `json:"data" yaml:"data"`
+		Timestamp     time.Time `json:"timestamp" yaml:"timestamp"`
+		AggregateId   string    `json:"aggregateId" yaml:"aggregateId"`
+		AggregateType string    `json:"aggregateType" yaml:"aggregateType"`
+		Version       int64     `json:"version" yaml:"version"`
+		Metadata      []byte    `json:"metadata" yaml:"metadata"`
+	}
+	if err := unmarshal(&obj); err != nil {
+		return err
+	}
+	event.id = obj.Id
+	event.typ = obj.Type
+	event.data = obj.Data
+	event.timestamp = obj.Timestamp
+	event.aggregateID = obj.AggregateId
+	event.aggregateType = obj.AggregateType
+	event.version = obj.Version
+	event.metadata = obj.Metadata
+	return nil
+}
+
+func (event *Event) UnmarshalJSON(data []byte) error {
+	return event.Unmarshal(func(obj any) error {
+		return json.Unmarshal(data, obj)
+	})
+}
+
 func NewEvent(root Aggregate, typ string) Event {
 	return Event{
 		id:            uuid.NewV4().String(),
@@ -33,8 +95,16 @@ func (e Event) ID() string {
 	return e.id
 }
 
+func (e *Event) SetID(id string) {
+	e.id = id
+}
+
 func (e Event) Type() string {
 	return e.typ
+}
+
+func (e *Event) SetType(typ string) {
+	e.typ = typ
 }
 
 func (e Event) Data() []byte {
