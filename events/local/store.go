@@ -3,10 +3,10 @@ package local
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"slices"
 
 	"github.com/boltdb/bolt"
+	"github.com/malijoe/kit/errors"
 	"github.com/malijoe/kit/events"
 )
 
@@ -67,11 +67,11 @@ func (s *store) LoadAggregate(ctx context.Context, agg events.Aggregate) error {
 	}
 	typeBckt := txn.Bucket([]byte(agg.Type()))
 	if typeBckt == nil {
-		return fmt.Errorf("did not find events for %s aggregate", agg.Type())
+		return errors.NotFoundErrorf("did not find events for %s aggregate", agg.Type())
 	}
 	aggBckt := typeBckt.Bucket([]byte(agg.ID()))
 	if aggBckt == nil {
-		return fmt.Errorf("did not find events for %s aggregate with id %s", agg.Type(), agg.ID())
+		return errors.NotFoundErrorf("did not find events for %s aggregate with id %s", agg.Type(), agg.ID())
 	}
 	var stream []events.Event
 	cursor := aggBckt.Cursor()
@@ -95,7 +95,7 @@ func (s *store) GetAggregatesOfType(ctx context.Context, typ string) (streams ma
 
 	typeBckt := txn.Bucket([]byte(typ))
 	if typeBckt == nil {
-		return nil, fmt.Errorf("did not find events for %s aggregate", typ)
+		return nil, errors.NotFoundErrorf("did not find events for %s aggregate", typ)
 	}
 	streams = make(map[string][]events.Event)
 	cursor := typeBckt.Cursor()
