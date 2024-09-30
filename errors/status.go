@@ -6,6 +6,11 @@ import (
 	"net/http"
 )
 
+type StatError interface {
+	error
+	Status() int
+}
+
 type statusError int
 
 var (
@@ -18,6 +23,10 @@ var (
 
 func (se statusError) Error() string {
 	return http.StatusText(int(se))
+}
+
+func (se statusError) Status() int {
+	return int(se)
 }
 
 func StatusError(status int, msg string) error {
